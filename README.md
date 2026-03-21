@@ -1,1 +1,1 @@
-# umc-10th-web-sihoon
+# UMC-Mission
