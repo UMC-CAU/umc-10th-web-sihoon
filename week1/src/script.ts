@@ -4,7 +4,7 @@ console.log('스크립트 실행됨');
 const todoInput = document.getElementById('todo-input') as HTMLInputElement;
 const todoForm = document.getElementById('todo-form') as HTMLFormElement;
 const todoList = document.getElementById('todo-list') as HTMLUListElement;
-const doenList = document.getElementById('done-list') as HTMLUListElement;
+const doneList = document.getElementById('done-list') as HTMLUListElement;
 //2. 할 일이 어떻게 생긴지 type 정리
 type ToDo= {
     id: number;
@@ -18,7 +18,7 @@ let doneTasks: ToDo[]= [];
 
 const renderTask=():void=>{
     todoList.innerHTML='';   //들어있는 내용 싹 비우기
-    doenList.innerHTML='';
+    doneList.innerHTML='';
 
     todos.forEach((todo)=>{
         const li=createTodoElement(todo,false);
@@ -27,7 +27,7 @@ const renderTask=():void=>{
 
     doneTasks.forEach((todo)=>{
         const li=createTodoElement(todo,true);
-        doenList.appendChild(li);
+        doneList.appendChild(li);
     })
 };
 
