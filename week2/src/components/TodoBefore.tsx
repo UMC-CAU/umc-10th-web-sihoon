@@ -2,7 +2,7 @@ import {useState} from 'react';
 import type { TTodo } from '../types/todo' //에러가..
 
 
-const Todo=() =>{
+const TodoBefore=() =>{
     const [todos, setTodos]=useState<TTodo[]>([]);
     const [doneTodos, setDoneTodos] = useState<TTodo[]>([]);
     const [input, setInput] = useState<string>('');
@@ -86,4 +86,4 @@ const Todo=() =>{
     )
 }
 
-export default Todo;
+export default TodoBefore;
