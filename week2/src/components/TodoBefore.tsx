@@ -30,7 +30,7 @@ const TodoBefore=() =>{
     }
         return (
 
-    <div className='todo-container'>
+    <main className='todo-container'>
        <h1 className='todo-container__header'>SiHOON TODO</h1>
        <form onSubmit={handleSubmit} className='todo-container__form'>
          <input 
@@ -39,8 +39,8 @@ const TodoBefore=() =>{
          type='text'
          className='todo-container__input'
          placeholder="할 일 입력"
-         required>
-         </input>
+         required
+         />
 
          <button type='submit' className='todo-container__button'>
             할 일 추가
@@ -52,7 +52,7 @@ const TodoBefore=() =>{
             <h2 className='render-container__title'>할 일</h2>
             <ul id='todo-list' className='render-container__list'>
                {todos.map((todo) => (
-                 <li className='render-container__item'>
+                 <li key={todo.id} className='render-container__item'>
                 <span className='render-container__item-text'>{todo.text}</span>
                <button onClick={()=>completeTodo(todo)}
                style={{
@@ -68,7 +68,7 @@ const TodoBefore=() =>{
             <h2 className='render-container__title'>완료</h2>
             <ul id='todo-list' className='render-container__list'>
                {doneTodos.map((todo) => (
-                 <li className='render-container__item'>
+                 <li className='render-container__item' key={todo.id}>
                 <span className='render-container__item-text'>{todo.text}</span>
                <button onClick={()=>deleteTodo(todo)}
                style={{
@@ -81,7 +81,7 @@ const TodoBefore=() =>{
          </div>
       </div>
 
-    </div>
+    </main>
 
     )
 }

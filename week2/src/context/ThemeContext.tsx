@@ -12,7 +12,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
     const toggleTheme = () => {
         setIsDark((prev) => {
-            document.documentElement.classList.toggle("dark", !prev);  //html 태그에 dark 클래스 토글
+            document.documentElement.classList.toggle("dark", !prev);  
+            //html 태그에 dark 클래스를 토글하여 다크모드를 적용하는 문법
             return !prev;
         });
     };
