@@ -3,6 +3,7 @@ import Homepage from './pages/HomePage';
 import MoviePage from './pages/Moviepage';
 import { createBrowserRouter, Route, RouterProvider } from 'react-router-dom';
 import NotFoundPage from './pages/NotFoundPage';
+import MovieDetailPage from './pages/MovieDetailPage';
 
 const router = createBrowserRouter([
   {
@@ -14,8 +15,12 @@ const router = createBrowserRouter([
         path: 'movies/:category',   // category만 쓰면 고정 문자열. :category로 쓰면 url에서 
                                                        // category부분이 바뀌어도 라우트가 유지됨.
         element: <MoviePage />,
-      }
+      },
 
+      {
+        path: 'movie/:movieID',
+        element: <MovieDetailPage />,
+      }
     ],
   },
 ]);
