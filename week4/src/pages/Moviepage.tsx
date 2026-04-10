@@ -8,7 +8,7 @@ import useCustomFetch from '../hooks/useCustomFetch';
 const MoviePage = () => {
   const [page, setPage] = useState(1);
 
-  const { category } = useParams<{ category: string }>();
+  const { category } = useParams<{ category: string }>(); //app.tsx 에서 카테고리 설정함
 
   // page나 category가 바뀌면 url이 바뀌어 자동으로 재요청됨
   const url = `https://api.themoviedb.org/3/movie/${category}?language=ko-KR&page=${page}`;

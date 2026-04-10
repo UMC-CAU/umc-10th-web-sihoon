@@ -43,7 +43,7 @@ const MovieDetailPage = () => {
       />
 
       {/* 컨텐츠 */}
-      <div className='relative z-100 max-w-5xl mx-auto p-8'>
+      <div className='relative z-10 max-w-5xl mx-auto p-8'>
         <div className='flex flex-col md:flex-row gap-10'>
           {/* 포스터 */}
           <div className='flex-shrink-0'>
@@ -58,7 +58,7 @@ const MovieDetailPage = () => {
           <div className='flex flex-col gap-5 justify-center'>
             <h1 className='text-4xl font-bold leading-tight'>{movie.title}</h1>
 
-            {/* 메타 정보 */}
+            {/* 영화 정보 */}
             <div className='flex flex-wrap gap-3 text-sm text-gray-300'>
               <span className='flex items-center gap-1'>
                 개봉일 {movie.release_date}
