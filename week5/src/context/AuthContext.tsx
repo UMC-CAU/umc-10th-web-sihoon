@@ -3,13 +3,13 @@ import type { RequestSigninDto } from "../types/auth.ts";
 import useLocalStorage from "../hooks/useLocalStorage.ts";
 import type { PropsWithChildren } from "react";
 import { LOCAL_STORAGE_KEY } from "../constants/key.ts";
-import { signin } from "../apis/auth.ts";
+import { signin, getMyInfo } from "../apis/auth.ts";
 
 
 interface AuthContextType {
     accessToken: string | null;
     refreshToken: string | null;
-
+    name: string | null;
     login: (signinData: RequestSigninDto) => Promise<void>;
     logout: () => Promise<void>;
 }
@@ -17,6 +17,7 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType>({
     accessToken: null,
     refreshToken: null,
+    name: null,
     login: async () => {},
     logout: async () => {},
 });
@@ -42,6 +43,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         getRefreshTokenFromStorage(),
     );
 
+    const [name, setName] = useState<string | null>(null);
+
     const login = async (signinData: RequestSigninDto) => {
         try {
             const data = await signin(signinData);
@@ -54,6 +57,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
                 setRefreshTokenInStorage(newRefreshToken);
                 setAccessToken(newAccessToken);
                 setRefreshToken(newRefreshToken);
+
+                const myInfo = await getMyInfo();
+                setName(myInfo.data.name);
+
                 alert("로그인 성공");
             }
         } catch (error) {
@@ -67,10 +74,11 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         removeRefreshTokenFromStorage();
         setAccessToken(null);
         setRefreshToken(null);
+        setName(null);
     };
 
     return (
-        <AuthContext.Provider value={{ accessToken, refreshToken, login, logout }}>
+        <AuthContext.Provider value={{ accessToken, refreshToken, name, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

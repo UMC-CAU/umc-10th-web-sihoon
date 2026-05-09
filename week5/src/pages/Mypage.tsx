@@ -27,10 +27,6 @@ const MyPage = () => {
 
     return <div>마이페이지
              <h1>{data?.data?.name}님 ㅎㅇㅇ</h1>
-             <button className="bg-red-500 text-white rounded px-4 py-2" 
-             onClick={handleLogout}>
-               로그아웃
-             </button>
            </div>;
 };
 
