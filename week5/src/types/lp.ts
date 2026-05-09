@@ -1,32 +1,17 @@
-import type { CommonResponse, CursorBasedResponse } from "./common.ts";
+import type { CommonResponse } from "./common.ts";
 
 export type Tag = {
-id: number;
-name: string;
+    id: number;
+    name: string;
 };
 
 export type Likes = {
-id: number;
-userld: number;
-lpld: number;
+    id: number;
+    userId: number;
+    lpId: number;
 };
 
-export type ResponseLpListDto = CursorBasedResponse<{
-data: {
-id: number;
-title: string;
-content: string;
-thumbnail: string;
-published: boolean;
-authorld: number;
-createdAt: Date;
-updatedAt: Date;
-tags: Tag[];
-likes: Likes[];
-}[];
-}>;
-
-export type ResponseLpDetailDto = CommonResponse<{
+export type Lp = {
     id: number;
     title: string;
     content: string;
@@ -37,4 +22,32 @@ export type ResponseLpDetailDto = CommonResponse<{
     updatedAt: Date;
     tags: Tag[];
     likes: Likes[];
+};
+
+export type Comment = {
+    id: number;
+    content: string;
+    lpId: number;
+    authorId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    author: {
+        id: number;
+        name: string;
+        avatar: string | null;
+    };
+};
+
+export type ResponseLpListDto = CommonResponse<{
+    data: Lp[];
+    nextCursor: number;
+    hasNext: boolean;
+}>;
+
+export type ResponseLpDetailDto = CommonResponse<Lp>;
+
+export type ResponseCommentListDto = CommonResponse<{
+    data: Comment[];
+    nextCursor: number;
+    hasNext: boolean;
 }>;

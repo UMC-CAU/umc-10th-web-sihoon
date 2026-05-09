@@ -1,12 +1,29 @@
-import { useState } from "react";
-import useGetLpList from "../hooks/queries/useGetLpList";
+import { useState, useEffect, useRef } from "react";
+import useGetInfiniteLpList from "../hooks/queries/useGetinfiniteLpList";
 import LpCard from "../components/LpCard";
+import LpCardSkeleton from "../components/LpCardSkeleton";
 
 const HomePage = () => {
     const [search, setSearch] = useState("");
     const [order, setOrder] = useState<"asc" | "desc">("desc");
+    const bottomRef = useRef<HTMLDivElement>(null);
 
-    const { data, isPending, isError, refetch } = useGetLpList({ search, order });
+    const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useGetInfiniteLpList(10, search, order);
+
+    const lps = data?.pages.flatMap((page) => page.data.data) ?? [];
+
+
+    // 스크롤 끝에 닿으면 자동으로 다음 페이지 로드
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting && hasNextPage) fetchNextPage();
+        });
+        if (bottomRef.current) observer.observe(bottomRef.current);
+        return () => observer.disconnect();
+    }, [hasNextPage, fetchNextPage]);
+
+
 
     return (
         <div className="p-6">
@@ -25,13 +42,17 @@ const HomePage = () => {
                 </button>
             </div>
 
+
+
+         {/*로딩 스켈레톤 */}
             {isPending && (
-                <div className="flex justify-center items-center mt-20">
-                    <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <LpCardSkeleton key={i} />)}
                 </div>
             )}
 
-        
+
+           
             {isError && (
                 <div className="flex flex-col items-center gap-4 mt-20 text-gray-400">
                     <p>데이터 로딩 실패.</p>
@@ -44,20 +65,31 @@ const HomePage = () => {
                 </div>
             )}
 
-            
+           
             {!isPending && !isError && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {data?.data.map((lp) => (
-                        <LpCard
-                            key={lp.id}
-                            id={lp.id}
-                            title={lp.title}
-                            thumbnail={lp.thumbnail}
-                            createdAt={lp.createdAt}
-                            likesCount={lp.likes.length}
-                        />
-                    ))}
-                </div>
+                <>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {lps.map((lp) => (
+                            <LpCard
+                                key={lp.id}
+                                id={lp.id}
+                                title={lp.title}
+                                thumbnail={lp.thumbnail}
+                                createdAt={lp.createdAt}
+                                likesCount={lp.likes.length}
+                            />
+                        ))}
+                    </div>
+
+                    {/* 스크롤 감지 기준점 - 스켈레톤 위에 배치 */}
+                    <div ref={bottomRef} className="h-4" />
+
+                    {(isFetchingNextPage || hasNextPage) && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <LpCardSkeleton key={i} />)}
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
