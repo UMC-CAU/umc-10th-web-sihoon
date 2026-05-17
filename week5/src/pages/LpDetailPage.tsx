@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getLpDetail } from "../apis/lp";
+import { getMyInfo } from "../apis/auth";
 import useGetInfiniteComments from "../hooks/queries/useGetInfiniteComments";
 import useCreateComment from "../hooks/mutations/useCreateComment";
 import useUpdateComment from "../hooks/mutations/useUpdateComment";
 import useDeleteComment from "../hooks/mutations/useDeleteComment";
 import useDeleteLp from "../hooks/mutations/useDeleteLp";
 import usePostLike from "../hooks/mutations/usePostLike";
+import useDeleteLike from "../hooks/mutations/useDeleteLike";
 import { useAuth } from "../context/AuthContext";
 
 const LpDetailPage = () => {
@@ -39,6 +41,24 @@ const LpDetailPage = () => {
     const { mutate: deleteComment } = useDeleteComment(id);
     const { mutate: deleteLp } = useDeleteLp();
     const { mutate: postLike } = usePostLike();
+    const { mutate: deleteLike } = useDeleteLike();
+
+    const { data: myInfo } = useQuery({
+        queryKey: ["myInfo"],
+        queryFn: getMyInfo,
+        select: (res) => res.data,
+        enabled: !!accessToken,
+    });
+
+    const isLiked = !!(myInfo && data?.likes.some((like) => like.userId === myInfo.id));
+
+    const handleLikeToggle = () => {
+        if (isLiked) {
+            deleteLike(data?.id as any, { onSuccess: () => refetch() });
+        } else {
+            postLike(data?.id as any, { onSuccess: () => refetch() });
+        }
+    };
 
     useEffect(() => {
         const observer = new IntersectionObserver(([entry]) => {
@@ -109,8 +129,8 @@ const LpDetailPage = () => {
                 {accessToken && (
                     <button onClick={handleDeleteLp} className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-lg transition-colors">삭제</button>
                 )}
-                <button onClick={() => postLike(data?.id as any, { onSuccess: () => refetch() })} className="bg-pink-600 hover:bg-pink-700 px-5 py-2 rounded-lg transition-colors">
-                    ♥ 좋아요
+                <button onClick={handleLikeToggle} className={`px-5 py-2 rounded-lg transition-colors ${isLiked ? "bg-pink-800 hover:bg-pink-900" : "bg-pink-600 hover:bg-pink-700"}`}>
+                    {isLiked ? "♥ 좋아요 취소" : "♥ 좋아요"}
                 </button>
             </div>
 

@@ -82,6 +82,7 @@ const LpCreateModal = ({ onClose }: LpCreateModalProps) => {
                     <button onClick={handleAddTag} className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg">추가</button>
                 </div>
 
+                {tags.length === 0 && <p className="text-xs text-red-400 mb-2">태그를 최소 1개 입력해주세요</p>}
                 <div className="flex flex-wrap gap-2 mb-4">
                     {tags.map((tag) => (
                         <span key={tag} className="bg-gray-700 px-3 py-1 rounded-full text-sm flex items-center gap-1">
@@ -98,7 +99,7 @@ const LpCreateModal = ({ onClose }: LpCreateModalProps) => {
 
                 <button
                     onClick={handleSubmit}
-                    disabled={isPending || !title.trim() || !content.trim()}
+                    disabled={isPending || !title.trim() || !content.trim() || tags.length === 0}
                     className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-40 py-2 rounded-lg font-semibold transition-colors"
                 >
                     {isPending ? "등록 중..." : "Add LP"}
