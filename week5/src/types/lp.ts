@@ -51,3 +51,21 @@ export type ResponseCommentListDto = CommonResponse<{
     nextCursor: number;
     hasNext: boolean;
 }>;
+
+export type RequestLpDto = { lpid: number; };
+
+export type RequestCreateLpDto = {
+    title: string;
+    content: string;
+    thumbnail?: string;
+    tags: string[];
+    published: boolean;
+};
+
+export type RequestUpdateLpDto = Partial<RequestCreateLpDto>;
+
+export type ResponseLikeLpDto = CommonResponse<{
+    id:number;
+    userId:number;
+    lpId:number;
+}>; 

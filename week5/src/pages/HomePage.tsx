@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import useGetInfiniteLpList from "../hooks/queries/useGetinfiniteLpList";
 import LpCard from "../components/LpCard";
 import LpCardSkeleton from "../components/LpCardSkeleton";
+import LpCreateModal from "../components/LpCreateModal";
 
 const HomePage = () => {
     const [search, setSearch] = useState("");
     const [order, setOrder] = useState<"asc" | "desc">("desc");
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
 
     const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -13,8 +15,6 @@ const HomePage = () => {
 
     const lps = data?.pages.flatMap((page) => page.data.data) ?? [];
 
-
-    // 스크롤 끝에 닿으면 자동으로 다음 페이지 로드
     useEffect(() => {
         const observer = new IntersectionObserver(([entry]) => {
             if (entry.isIntersecting && hasNextPage) fetchNextPage();
@@ -22,8 +22,6 @@ const HomePage = () => {
         if (bottomRef.current) observer.observe(bottomRef.current);
         return () => observer.disconnect();
     }, [hasNextPage, fetchNextPage]);
-
-
 
     return (
         <div className="p-6">
@@ -42,46 +40,29 @@ const HomePage = () => {
                 </button>
             </div>
 
-
-
-         {/*로딩 스켈레톤 */}
             {isPending && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <LpCardSkeleton key={i} />)}
                 </div>
             )}
 
-
-           
             {isError && (
                 <div className="flex flex-col items-center gap-4 mt-20 text-gray-400">
                     <p>데이터 로딩 실패.</p>
-                    <button
-                        onClick={() => refetch()}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors"
-                    >
+                    <button onClick={() => refetch()} className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors">
                         다시시도
                     </button>
                 </div>
             )}
 
-           
             {!isPending && !isError && (
                 <>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         {lps.map((lp) => (
-                            <LpCard
-                                key={lp.id}
-                                id={lp.id}
-                                title={lp.title}
-                                thumbnail={lp.thumbnail}
-                                createdAt={lp.createdAt}
-                                likesCount={lp.likes.length}
-                            />
+                            <LpCard key={lp.id} id={lp.id} title={lp.title} thumbnail={lp.thumbnail} createdAt={lp.createdAt} likesCount={lp.likes.length} />
                         ))}
                     </div>
 
-                    {/* 스크롤 감지 기준점 - 스켈레톤 위에 배치 */}
                     <div ref={bottomRef} className="h-4" />
 
                     {(isFetchingNextPage || hasNextPage) && (
@@ -91,6 +72,16 @@ const HomePage = () => {
                     )}
                 </>
             )}
+
+            {/* LP 작성 플로팅 버튼 */}
+            <button
+                onClick={() => setIsModalOpen(true)}
+                className="fixed bottom-8 right-8 w-14 h-14 bg-purple-600 hover:bg-purple-700 text-white text-3xl rounded-full shadow-lg transition-colors flex items-center justify-center"
+            >
+                +
+            </button>
+
+            {isModalOpen && <LpCreateModal onClose={() => setIsModalOpen(false)} />}
         </div>
     );
 };

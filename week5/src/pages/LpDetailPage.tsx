@@ -1,19 +1,44 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useGetLpDetail from "../hooks/queries/useGetLpDetail";
+import { useQuery } from "@tanstack/react-query";
+import { getLpDetail } from "../apis/lp";
 import useGetInfiniteComments from "../hooks/queries/useGetInfiniteComments";
+import useCreateComment from "../hooks/mutations/useCreateComment";
+import useUpdateComment from "../hooks/mutations/useUpdateComment";
+import useDeleteComment from "../hooks/mutations/useDeleteComment";
+import useDeleteLp from "../hooks/mutations/useDeleteLp";
+import usePostLike from "../hooks/mutations/usePostLike";
+import { useAuth } from "../context/AuthContext";
 
 const LpDetailPage = () => {
     const { lpId } = useParams();
     const navigate = useNavigate();
+    const { accessToken } = useAuth();
+    const id = Number(lpId);
+
     const [commentOrder, setCommentOrder] = useState<"asc" | "desc">("desc");
+    const [commentInput, setCommentInput] = useState("");
+    const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+    const [editingContent, setEditingContent] = useState("");
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    const { data, isPending, isError, refetch } = useGetLpDetail(Number(lpId));
+    const { data, isPending, isError, refetch } = useQuery({
+        queryKey: ["lp", id],
+        queryFn: () => getLpDetail(id),
+        select: (res) => res.data,
+    });
+
     const { data: commentData, fetchNextPage, hasNextPage } =
-        useGetInfiniteComments(Number(lpId), commentOrder);
+        useGetInfiniteComments(id, commentOrder);
 
     const comments = commentData?.pages.flatMap((page) => page.data.data) ?? [];
+
+    const { mutate: createComment, isPending: isCreating } = useCreateComment(id);
+    const { mutate: updateComment } = useUpdateComment(id);
+    const { mutate: deleteComment } = useDeleteComment(id);
+    const { mutate: deleteLp } = useDeleteLp();
+    const { mutate: postLike } = usePostLike();
 
     useEffect(() => {
         const observer = new IntersectionObserver(([entry]) => {
@@ -22,6 +47,22 @@ const LpDetailPage = () => {
         if (bottomRef.current) observer.observe(bottomRef.current);
         return () => observer.disconnect();
     }, [hasNextPage, fetchNextPage]);
+
+    const handleDeleteLp = () => {
+        if (!confirm("LP를 삭제하시겠습니까?")) return;
+        deleteLp(id, { onSuccess: () => navigate("/") });
+    };
+
+    const handleCommentSubmit = () => {
+        if (!commentInput.trim()) return;
+        createComment(commentInput, { onSuccess: () => setCommentInput("") });
+    };
+
+    const handleEditSave = (commentId: number) => {
+        updateComment({ commentId, content: editingContent }, {
+            onSuccess: () => setEditingCommentId(null),
+        });
+    };
 
     if (isPending) {
         return (
@@ -62,10 +103,18 @@ const LpDetailPage = () => {
                 </div>
             ) : null}
 
-            <p className="text-gray-900 leading-relaxed whitespace-pre-line mb-8">{data?.content}</p>
+            <p className="text-gray-300 leading-relaxed whitespace-pre-line mb-8">{data?.content}</p>
 
+            <div className="flex gap-3 mb-10">
+                {accessToken && (
+                    <button onClick={handleDeleteLp} className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-lg transition-colors">삭제</button>
+                )}
+                <button onClick={() => postLike(data?.id as any, { onSuccess: () => refetch() })} className="bg-pink-600 hover:bg-pink-700 px-5 py-2 rounded-lg transition-colors">
+                    ♥ 좋아요
+                </button>
+            </div>
 
-    
+            
             <div className="border-t border-gray-700 pt-6">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold">댓글</h2>
@@ -77,16 +126,79 @@ const LpDetailPage = () => {
                     </button>
                 </div>
 
+               
+                <div className="flex gap-2 mb-6">
+                    <input
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                        placeholder="댓글을 입력하세요"
+                        className="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-sm outline-none focus:border-purple-500"
+                    />
+                    <button
+                        onClick={handleCommentSubmit}
+                        disabled={isCreating || !commentInput.trim()}
+                        className="bg-purple-600 hover:bg-purple-700 disabled:opacity-40 px-4 py-2 rounded-lg text-sm transition-colors"
+                    >
+                        등록
+                    </button>
+                </div>
+
                 <div className="space-y-4">
                     {comments.map((comment) => (
                         <div key={comment.id} className="flex gap-3 bg-gray-900 rounded-lg p-3">
                             <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs shrink-0">
                                 {comment.author.name[0]}
                             </div>
-                            <div>
+                            <div className="flex-1">
                                 <p className="text-sm font-medium">{comment.author.name}</p>
-                                <p className="text-sm text-gray-300 mt-0.5">{comment.content}</p>
+                                {editingCommentId === comment.id ? (
+                                    <div className="flex gap-2 mt-1">
+                                        <input
+                                            value={editingContent}
+                                            onChange={(e) => setEditingContent(e.target.value)}
+                                            className="flex-1 bg-gray-700 rounded px-2 py-1 text-sm outline-none"
+                                        />
+                                        <button onClick={() => handleEditSave(comment.id)} className="text-purple-400 text-sm">저장</button>
+                                        <button onClick={() => setEditingCommentId(null)} className="text-gray-400 text-sm">취소</button>
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-300 mt-0.5">{comment.content}</p>
+                                )}
                             </div>
+
+                            {accessToken && (
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setOpenMenuId(openMenuId === comment.id ? null : comment.id)}
+                                        className="text-gray-400 hover:text-white px-1"
+                                    >
+                                        ···
+                                    </button>
+                                    {openMenuId === comment.id && (
+                                        <div className="absolute right-0 top-6 bg-gray-700 rounded-lg shadow-lg z-10 w-20 overflow-hidden">
+                                            <button
+                                                onClick={() => {
+                                                    setEditingCommentId(comment.id);
+                                                    setEditingContent(comment.content);
+                                                    setOpenMenuId(null);
+                                                }}
+                                                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-600"
+                                            >
+                                                수정
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    deleteComment(comment.id);
+                                                    setOpenMenuId(null);
+                                                }}
+                                                className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-600"
+                                            >
+                                                삭제
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ))}
                     <div ref={bottomRef} className="h-4" />
