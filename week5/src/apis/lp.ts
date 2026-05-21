@@ -1,5 +1,5 @@
 import type { PaginationDto } from "../types/common";
-import type { RequestCreateLpDto, RequestLpDto, RequestUpdateLpDto, ResponseCommentListDto, ResponseLikeLpDto, ResponseLpDetailDto, ResponseLpListDto } from "../types/lp";
+import type { RequestCreateLpDto, RequestUpdateLpDto, ResponseCommentListDto, ResponseLikeLpDto, ResponseLpDetailDto, ResponseLpListDto } from "../types/lp";
 import { axiosInstance } from "./axios";
 
 export const getLpList = async (paginationDto: PaginationDto): Promise<ResponseLpListDto> => {
@@ -56,12 +56,12 @@ export const uploadImage = async (file: File): Promise<string> => {
     return data.data.url;
 };
 
-export const postlike = async (lpId: RequestLpDto): Promise<ResponseLikeLpDto> => {
+export const postlike = async (lpId: number): Promise<ResponseLikeLpDto> => {
     const { data } = await axiosInstance.post(`/v1/lps/${lpId}/likes`);
     return data;
 };
 
-export const deletelike = async (lpId: RequestLpDto): Promise<ResponseLikeLpDto> => {
+export const deletelike = async (lpId: number): Promise<ResponseLikeLpDto> => {
     const { data } = await axiosInstance.delete(`/v1/lps/${lpId}/likes`);
     return data;
 };
