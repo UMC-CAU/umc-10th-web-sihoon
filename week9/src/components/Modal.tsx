@@ -1,9 +1,10 @@
 import { useAppDispatch } from './hooks/useCustomRedux';
 import { closeModal } from '../slices/modalSlice';
-import { clearCart } from '../slices/cartSlice';
+import { useCartActions } from './hooks/useCartStore';
 
 const Modal = () => {
     const dispatch = useAppDispatch();
+    const { clearCart } = useCartActions();
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -18,7 +19,7 @@ const Modal = () => {
                     </button>
                     <button
                         onClick={() => {
-                            dispatch(clearCart());
+                            clearCart();
                             dispatch(closeModal());
                         }}
                         className="flex-1 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 cursor-pointer"

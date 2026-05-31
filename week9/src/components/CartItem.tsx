@@ -1,6 +1,5 @@
 import type {Lp} from '../types/cart';
-import { useAppDispatch } from './hooks/useCustomRedux';
-import { decrease, increase } from '../slices/cartSlice';
+import { useCartActions } from './hooks/useCartStore';
 
 interface CartItemProps {
      lp: Lp;
@@ -8,14 +7,14 @@ interface CartItemProps {
 
 
 const CartItem = ({ lp }: CartItemProps) => {
-    const dispatch = useAppDispatch();
+    const { increase, decrease } = useCartActions();
 
     const handleIncrease = () => {
-        dispatch(increase({ id: lp.id }));
+        increase(lp.id);
     };
 
-      const handleDecrease = () => {
-        dispatch(decrease({ id: lp.id }));
+    const handleDecrease = () => {
+        decrease(lp.id);
     };
 
     return (

@@ -1,13 +1,13 @@
-import { useAppSelector } from './hooks/useCustomRedux';
 import { useAppDispatch } from './hooks/useCustomRedux';
 import { openModal } from '../slices/modalSlice';
+import { useCartInfo } from './hooks/useCartStore';
 
 const PriceBox = () => {
-    const {total} = useAppSelector((state) => state.cart);
+    const { total } = useCartInfo();
     const dispatch = useAppDispatch();
 
     const handleInitaialize = () => {
-        dispatch(openModal());
+        dispatch(openModal()); //모달열리게 변경
     }
 
 

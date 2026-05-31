@@ -2,14 +2,16 @@ import {FaShoppingCart} from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from './hooks/useCustomRedux';
 import { calculateTotals } from '../slices/cartSlice';
 import { useEffect } from 'react';
+import { useCartActions, useCartInfo } from './hooks/useCartStore';
 
 const Navbar = () => {
-    const {amount,cartItems} = useAppSelector((state) => state.cart);
-    const dispatch = useAppDispatch();
-
+    const{amount,cartItems}=useCartInfo();
+    const {calculateTotals} = useCartActions();
+    
+ //주스탠드로 대체
     useEffect(() => {
-        dispatch(calculateTotals());
-    }, [dispatch, cartItems]);
+        calculateTotals();
+    }, [calculateTotals, cartItems]);
     
     return (
         <div className="flex justify-between items-center p-4 bg-gray-800 text-white">
