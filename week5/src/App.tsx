@@ -14,6 +14,7 @@ import GoogleLoginRedirectPage from "./pages/GoogleLoginRedirectPage"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import React from "react"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import ThrottlePage from "./pages/ThrottlePage"
 
 //1. 홈페이지
 //2. 로그인 페이지
@@ -30,6 +31,7 @@ const publicRoutes:RouteObject[] =[
       {path:"login", element:<LoginPage/>},
       {path:"signup", element:<SignupPage/>},
       {path:"lp/:lpId", element:<LpDetailPage/>},
+      {path:"/throttle", element:<ThrottlePage/>},
     ],
   },
 ];
