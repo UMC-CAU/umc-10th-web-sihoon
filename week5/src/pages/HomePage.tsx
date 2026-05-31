@@ -3,15 +3,17 @@ import useGetInfiniteLpList from "../hooks/queries/useGetinfiniteLpList";
 import LpCard from "../components/LpCard";
 import LpCardSkeleton from "../components/LpCardSkeleton";
 import LpCreateModal from "../components/LpCreateModal";
+import useDebounce from "../hooks/queries/useDebounce";
 
 const HomePage = () => {
     const [search, setSearch] = useState("");
     const [order, setOrder] = useState<"asc" | "desc">("desc");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
+    const debouncedSearch = useDebounce(search, 300);
 
     const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useGetInfiniteLpList(10, search, order);
+        useGetInfiniteLpList(10, debouncedSearch, order);
 
     const lps = data?.pages.flatMap((page) => page.data.data) ?? [];
 
