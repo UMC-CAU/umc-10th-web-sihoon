@@ -5,7 +5,7 @@ import { queryClient } from "../../App";
 
 function usePostLike() {
     return useMutation({
-        mutationFn: (lpId: number) => postlike(lpId as any),
+        mutationFn: postlike,
 
         onMutate: async (lpId: number) => {
             await queryClient.cancelQueries({ queryKey: ["lp", lpId] });

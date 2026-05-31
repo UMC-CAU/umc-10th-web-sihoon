@@ -5,7 +5,7 @@ import { queryClient } from "../../App";
 
 function useDeleteLike() {
     return useMutation({
-        mutationFn: (lpId: number) => deletelike(lpId as any),
+        mutationFn: deletelike,
 
         onMutate: async (lpId: number) => {
             await queryClient.cancelQueries({ queryKey: ["lp", lpId] });
